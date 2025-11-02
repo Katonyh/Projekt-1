@@ -105,6 +105,8 @@ void System::handleButtonPressed() noexcept
     myPredictTimer.restart();
 }
 
+//! \note Jag gillar denna metod. Jättesnyggt att ni lade till denna variant i stället för att
+//!       skriva samma kodstycke två gånger (i handleButtonPressed samt handlePredictTimerInterrupt).
 // -----------------------------------------------------------------------------
 void System::predictTemperature() const noexcept
 {

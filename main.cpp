@@ -1,3 +1,6 @@
+//! \note Bra jobbat här!
+
+//! \note Denna kommentar är out of date, detta är inte längre ett device driver demo. :)
 /**
  * @brief Demonstration of GPIO device drivers in C++:
  * 
@@ -9,6 +12,7 @@
  *            - An EEPROM stream is used to store the LED state. On startup, this value is read;
  *              if the last stored state before power down was "on," the LED will automatically blink.
  */
+//! \note Bra sorterat av headerfilerna!
 #include "container/vector.h"
 #include "driver/atmega328p/adc.h"
 #include "driver/atmega328p/eeprom.h"
@@ -19,6 +23,12 @@
 #include "ml/lin_reg/lin_reg.h"
 #include "target/system.h"
 
+//! \note Snyggt att ni lägger using-direktiven på fil-nivå i .cpp-filerna. Då kan ni förutom
+//!       att slippa skriva driver::atmega328p::Led osv. kontrollera att ni inte får namnkrockar.
+//!       Detta hade exempelvis kunnat ske om ni använder ett using-direktiv för ett annat namespace
+//!       X som också innehåller en klass döpt Led och så vidare. Ligger ett using-direktiv i en
+//!       headerfil ökar chansen för detta kraftigt, då using-direktiven då inte är "kontrollerade"
+//!       och dessa oftast inkluderas på många ställen.
 using namespace container;
 using namespace driver::atmega328p;
 
@@ -77,15 +87,20 @@ int main()
     // Expected temperature in Celsius; T = 100 * Vin - 50.
     const Vector<double> trainOutput{-50.0, -40.0, -30.0, -20.0, -10.0, 0.0, 10.0, 20.0, 30.0, 40.0, 50.0};
 
+    //! \note Jag lade till en kommentar för er modell här.
+    // Create a machine learning model for temperature prediction.
     ml::lin_reg::LinReg model{trainInput, trainOutput};
 
-    // trains the model here.
+    // Train the linear regression model during 2000 epochs with a 10 % learning rate.
     const bool trained = model.train(2000, 0.1);
     
+    //! \note Variabeln "trained" är en placeholder, men eftersom detta är "release-mjukvaran" hade
+    //!       den kunnat tas bort.
     // This constant might be used later, so save it for now.
     (void) (trained);
     
-
+    //! \note Lade till en kommentar här med.
+    //! Test the linear regression model post training, print the result in the terminal.
     for (const auto& input : trainInput)
     {
         const double prediction{model.predict(input)};
@@ -113,6 +128,9 @@ int main()
     // Obtain a reference to the singleton ADC instance.
     auto& adc{Adc::getInstance()};
 
+    //! \note Snyggt att ni passerar modellen samt temperatursensors pin-nummer till 
+    //!       system-implementationen. Ni som användare kan då välja vad ni vill använda,
+    //!       samtidigt som system-implementationen löser logiken.
     // Initialize the system with the given hardware.
     target::System system{led, button, debounceTimer, predictTimer, 
         serial, watchdog, eeprom, adc, model, tempSensorPin};
