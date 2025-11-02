@@ -1,3 +1,7 @@
+//! \note Bra jobbat!
+//!
+//! \remark Ni hade fått dubletter - jag hittade en till system.h inuti source-katalogen. Jag tog
+//!         dock bort denna.
 /**
  * @brief Generic system implementation for an MCU with configurable hardware devices.
  */
@@ -24,6 +28,26 @@ class TimerInterface;
 class WatchdogInterface;
 } // namespace driver
 
+//! \note Utmärkt att ni fördeklarerar ert linReg-interface i stället för att inkludera filen direkt.
+//!       När ni gör detta minskar dependencies (alla andra som inkluderar denna header behöver då
+//!       inte ha "ml/lin_reg/interface.h" tillgänlig) samt att kompileringstiden minskar, då det
+//!       blir mindre kod inklistrat här. Även om ert interface är litet så gäller många bäckar små;
+//!       Gör ni detta konsekvent för alla headerfiler minskar kraftigt den totala koden i 
+//!       headerfilerna och det går fortare att kompilera.
+//!
+//!       Att fördeklarera fungerar bra, då enbart linReg-referenser används samt att ni inte
+//!       använder denna typ här (ni kallar inte på funktioner såsom train med mera => kompilatorn
+//!       behöver ej information om hur ml::lin_reg::Interface ser ut i detta skede). Eftersom
+//!       pekare och referenser alltid är lika stora går det utmärkt att bara fördeklarera typer,
+//!       så länge man bara refererar till dem via pekare eller referenser, samtidigt som man inte
+//!       interagerar med typen per se. Om ni hade försökt använda en pass-by-value hade ni dock
+//!       fått ett kompileringsfel, då kompilatorn i så fall måste känna till storleken på en typ
+//!       (kompilatorn måste känna till hur många byte den måste "lägga" på stacken).
+//!
+//!       Som exempel, ett linReg-objekt lär uppta 14 byte. Motsvarande pekare eller referens
+//!       upptar 2 byte i detta system. Om ni har fördeklarerat linReg och sedan referearar till
+//!       denna, så vet kompilatorn att den måste "lägga" 2 byte på stacken, även om den inte har
+//!       en aning om vad denna typ är för något => super.
 namespace ml
 {
 namespace lin_reg
@@ -35,6 +59,7 @@ class Interface;
 
 namespace target
 {
+//! \note Denna kommentar är lite out of date, men OK.
 /**
  * @brief Generic system for an MCU with configurable hardware devices.
  * 
@@ -55,6 +80,7 @@ namespace target
 class System final
 {
 public:
+    //! \note Denna kommentar är uppdaterad för att matcha det nya systemet => super!
     /**
      * @brief Create a new system.
      *     
@@ -150,6 +176,8 @@ private:
     /** A/D converter . */
     driver::AdcInterface& myAdc;
 
+    //! \note Grymt att ni hör följer befintlig stil. Det är ett bra tips att göra i allmänhet
+    //!       nu när ni är på väg in i industrin.
     /** Linear regression model for temperature prediction. */
     ml::lin_reg::Interface& myModel;
 
